@@ -27,5 +27,3 @@ def baseline():
     with open ("baseline.txt","a") as w :
         w.write(f"\nBaseline created for {count} files")
     print(f"\nBaseline created for {count} files")
-
-baseline()
