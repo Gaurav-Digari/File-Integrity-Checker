@@ -41,13 +41,67 @@ def compare(filename):
 
     return None
 
-
-
 def checkfiles():
-    if os.path.isfile("!baseline.txt"):
+    try:
+        f=open("baseline.txt","r")
+        f.close()
+    except FileNotFoundError:
         print("No baseline found. Run option 1 first.")
-        exit
+        return
+
+    results = {}
+
     for f in file:
         current_hash = create_hash(f)
         saved_hash = compare(f)
-        
+
+        if saved_hash is None:
+            results[f] = "NEW"
+        elif current_hash == saved_hash:
+            results[f] = "OK"
+        else:
+            results[f] = "MODIFIED"
+
+    with open("baseline.txt", "r") as base:
+        for line in base:
+            saved_file, saved_hash = line.split(":", 1)
+            if saved_file.strip() not in file:
+                results[saved_file.strip()] = "MISSING"
+
+    print("\nINTEGRITY CHECK")
+    print("===============")
+
+    ok = 0
+    modified = 0
+    missing = 0
+    new = 0
+
+    for name in sorted(results):
+        label = results[name]
+        print(f"{name:<20} {label}")
+
+        if label == "OK":
+            ok += 1
+        elif label == "MODIFIED":
+            modified += 1
+        elif label == "MISSING":
+            missing += 1
+        elif label == "NEW":
+            new += 1
+
+    print("\nSummary")
+    print("-------")
+    print(f"{'OK':<9}: {ok}")
+    print(f"{'MODIFIED':<9}: {modified}")
+    print(f"{'MISSING':<9}: {missing}")
+    print(f"{'NEW':<9}: {new}")
+
+print("FILE INTEGRITY CHECKER")
+print("1. Create baseline")
+print("2. Check files")
+choice=int(input("Enter choice:"))
+
+if choice==1:
+    write_file()
+elif choice==2:
+    checkfiles()
